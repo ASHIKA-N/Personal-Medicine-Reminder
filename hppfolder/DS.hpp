@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <algorithm>
+#include <limits>
 #include "Struct.hpp"
 #include "FileHandler.hpp"
 
@@ -105,7 +106,7 @@ struct PairHash
 struct LinkedList
 {
     Node *head;
-    unordered_map<string, vector<Node *>> hash;
+    unordered_map<pair<string, string>, vector<Node *>, PairHash> hash;
 
     unordered_map<pair<string, string>, int, PairHash> qty;
 
@@ -194,7 +195,7 @@ struct LinkedList
             r->next = t;
         }
 
-        hash[t->a.name].push_back(t);
+        hash[{t->a.name, t->a.dosage}].push_back(t);
         a.NV = t->a;
         u.push(a);
         cout << "Medicine added successfully!\n";
@@ -229,24 +230,17 @@ struct LinkedList
             head = head->next;
             a.OV = temp->a;
             a.qb = qty[{temp->a.name, temp->a.dosage}];
-            auto &vec = hash[temp->a.name];
+            auto key = make_pair(temp->a.name, temp->a.dosage);
+            auto &vec = hash[key];
+
             vec.erase(remove(vec.begin(), vec.end(), temp), vec.end());
+
             if (vec.empty())
-                hash.erase(temp->a.name);
-            bool stillExists = false;
-            if (hash.find(temp->a.name) != hash.end())
             {
-                for (Node *n : hash[temp->a.name])
-                {
-                    if (n->a.dosage == temp->a.dosage)
-                    {
-                        stillExists = true;
-                        break;
-                    }
-                }
+                hash.erase(key);
+                qty.erase(key);
             }
-            if (!stillExists)
-                qty.erase({temp->a.name, temp->a.dosage});
+
             delete temp;
             cout << medName << " at ";
             t.disp();
@@ -265,24 +259,17 @@ struct LinkedList
             r->next = temp->next;
             a.OV = temp->a;
             a.qb = qty[{temp->a.name, temp->a.dosage}];
-            auto &vec = hash[temp->a.name];
+            auto key = make_pair(temp->a.name, temp->a.dosage);
+            auto &vec = hash[key];
+
             vec.erase(remove(vec.begin(), vec.end(), temp), vec.end());
+
             if (vec.empty())
-                hash.erase(temp->a.name);
-            bool stillExists = false;
-            if (hash.find(temp->a.name) != hash.end())
             {
-                for (Node *n : hash[temp->a.name])
-                {
-                    if (n->a.dosage == temp->a.dosage)
-                    {
-                        stillExists = true;
-                        break;
-                    }
-                }
+                hash.erase(key);
+                qty.erase(key);
             }
-            if (!stillExists)
-                qty.erase({temp->a.name, temp->a.dosage});
+
             delete temp;
             cout << medName << " at ";
             t.disp();
@@ -334,11 +321,13 @@ struct LinkedList
             }
         }
 
-        hash.erase(medName);
-        for (auto it = qty.begin(); it != qty.end();)
+        for (auto it = hash.begin(); it != hash.end();)
         {
             if (it->first.first == medName)
-                it = qty.erase(it);
+            {
+                qty.erase(it->first);
+                it = hash.erase(it);
+            }
             else
                 ++it;
         }
@@ -353,103 +342,113 @@ struct LinkedList
 
     void search(const string &name)
     {
-        if (hash.find(name) == hash.end())
+        bool found = false;
+
+        for (auto &[key, vec] : hash)
         {
+            if (key.first == name)
+            {
+                if (!found)
+                {
+                    cout << "Medicines named \"" << name << "\":\n";
+                    cout << "----------------------------------\n";
+                    found = true;
+                }
+
+                for (Node *n : vec)
+                {
+                    n->a.disp();
+                    cout << "Quantity: " << qty[key] << endl;
+                    cout << "----------------------------------\n";
+                }
+            }
+        }
+
+        if (!found)
             cout << "No medicine named \"" << name << "\" found.\n";
-            return;
-        }
-
-        int count = hash[name].size();
-        cout << "\n"
-             << count << " medicine(s) found for \"" << name << "\":\n";
-        cout << "------------------------------------------\n";
-
-        int i = 1;
-        for (Node *n : hash[name])
-        {
-            cout << "[" << i++ << "] ";
-            n->a.disp();
-            auto key = make_pair(n->a.name, n->a.dosage);
-            cout << "Quantity: " << qty[key] << endl;
-            cout << "------------------------------------------\n";
-        }
     }
 
     bool find(const string &name)
     {
-        return hash.find(name) != hash.end();
+        for (auto &p : hash)
+            if (p.first.first == name)
+                return true;
+        return false;
     }
 
     void altermed(Stack &u)
     {
-        Action c;
-        c.act = 'u';
-        Node *r = head;
-        if (!r)
+        if (hash.empty())
         {
             cout << "List is Empty\n";
             return;
         }
-        while (r)
+
+        Action c;
+        c.act = 'u';
+
+        string name, dosage;
+        cout << "Enter medicine name to alter: ";
+        getline(cin, name);
+        cout << "Enter dosage to alter: ";
+        getline(cin, dosage);
+
+        auto key = make_pair(name, dosage);
+
+        if (hash.find(key) == hash.end())
+        {
+            cout << "No such medicine found.\n";
+            return;
+        }
+
+        auto &vec = hash[key];
+
+        for (Node *r : vec)
         {
             r->a.disp();
-            auto key = make_pair(r->a.name, r->a.dosage);
-            if (qty.find(key) != qty.end())
-                cout << "Quantity: " << qty[key] << endl;
-            else
-                cout << "Quantity: (not set)\n";
+            cout << "Quantity: " << qty[key] << endl;
+
             char op;
-            cout << "Do you want to change any details? (y/n): ";
+            cout << "Do you want to change this entry? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
             if (op != 'y' && op != 'Y')
-            {
-                r = r->next;
                 continue;
-            }
 
             c.OV = r->a;
 
             cout << "Change medicine name? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
             if (op == 'y' || op == 'Y')
             {
-                auto &oldVec = hash[c.OV.name];
+                int oldQty = qty[key];
+
+                auto &oldVec = hash[key];
                 oldVec.erase(remove(oldVec.begin(), oldVec.end(), r), oldVec.end());
+
                 if (oldVec.empty())
-                    hash.erase(c.OV.name);
+                {
+                    hash.erase(key);
+                    qty.erase(key);
+                }
+
                 cout << "Enter new name: ";
                 getline(cin, r->a.name);
-                hash[r->a.name].push_back(r);
-                auto oldKey = make_pair(c.OV.name, c.OV.dosage);
+
                 auto newKey = make_pair(r->a.name, r->a.dosage);
+                hash[newKey].push_back(r);
+                qty[newKey] = oldQty;
 
-                if (oldKey != newKey)
-                {
-                    int oldQty = qty[oldKey];
-
-                    bool stillUsed = false;
-                    for (Node *tmp = head; tmp; tmp = tmp->next)
-                    {
-                        if (tmp != r && tmp->a.name == c.OV.name && tmp->a.dosage == c.OV.dosage)
-                        {
-                            stillUsed = true;
-                            break;
-                        }
-                    }
-
-                    if (!stillUsed)
-                        qty.erase(oldKey);
-
-                    qty[newKey] = oldQty;
-                }
+                key = newKey;
             }
 
             cout << "Change time? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
             if (op == 'y' || op == 'Y')
             {
                 cout << "Enter hour and min: ";
@@ -459,42 +458,42 @@ struct LinkedList
             cout << "Change dosage? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
             if (op == 'y' || op == 'Y')
             {
-                auto oldKey = make_pair(r->a.name, c.OV.dosage);
-                auto oldIt = qty.find(oldKey);
-                int oldQty = (oldIt != qty.end()) ? oldIt->second : 0;
+                int oldQty = qty[key];
+
+                auto &oldVec = hash[key];
+                oldVec.erase(remove(oldVec.begin(), oldVec.end(), r), oldVec.end());
+
+                if (oldVec.empty())
+                {
+                    hash.erase(key);
+                    qty.erase(key);
+                }
 
                 cout << "Enter new dosage: ";
                 getline(cin, r->a.dosage);
 
                 auto newKey = make_pair(r->a.name, r->a.dosage);
+                hash[newKey].push_back(r);
                 qty[newKey] = oldQty;
 
-                bool stillUsed = false;
-                for (Node *tmp = head; tmp; tmp = tmp->next)
-                {
-                    if (tmp != r && tmp->a.name == oldKey.first && tmp->a.dosage == oldKey.second)
-                    {
-                        stillUsed = true;
-                        break;
-                    }
-                }
-
-                if (!stillUsed && oldIt != qty.end())
-                    qty.erase(oldIt);
+                key = newKey;
             }
 
             cout << "Change days? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
             if (op == 'y' || op == 'Y')
             {
                 r->a.dy.clear();
-                int c;
+                int ch;
                 cout << "1.Certain days 2.Daily: ";
-                cin >> c;
-                if (c == 1)
+                cin >> ch;
+
+                if (ch == 1)
                 {
                     char o;
                     for (int i = 1; i <= 7; i++)
@@ -515,30 +514,34 @@ struct LinkedList
             cout << "Change quantity? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
             if (op == 'y' || op == 'Y')
             {
-                c.qb = qty[{r->a.name, r->a.dosage}];
+                c.qb = qty[key];
                 int newQty;
                 cout << "Enter new quantity: ";
                 cin >> newQty;
-                qty[{r->a.name, r->a.dosage}] = newQty;
+                qty[key] = newQty;
             }
 
             cout << "Change expiry date? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
             if (op == 'y' || op == 'Y')
             {
                 int d, m, y;
                 cout << "Day Month Year: ";
                 cin >> d >> m >> y;
-                r->a.exp = Date(Date::isValid(d, m, y) ? d : 1, Date::isValid(d, m, y) ? m : 1, Date::isValid(d, m, y) ? y : 2000);
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                r->a.exp = Date(
+                    Date::isValid(d, m, y) ? d : 1,
+                    Date::isValid(d, m, y) ? m : 1,
+                    Date::isValid(d, m, y) ? y : 2000);
             }
 
             c.NV = r->a;
             u.push(c);
-            r = r->next;
         }
     }
 
