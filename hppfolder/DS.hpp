@@ -10,6 +10,23 @@
 
 using namespace std;
 
+struct AlterRequest
+{
+    Node *node;
+    bool changeName = false;
+    bool changeDosage = false;
+    bool changeQty = false;
+    string newName;
+    string newDosage;
+    int newQty;
+    bool changeTime = false;
+    Time newTime;
+    bool changeDays = false;
+    vector<int> newDays;
+    bool changeExp = false;
+    Date newExp;
+};
+
 class Stack
 {
     vector<Action> a;
@@ -376,6 +393,58 @@ struct LinkedList
         return false;
     }
 
+    void removeNode(Node *target)
+    {
+        if (!head || !target)
+            return;
+
+        Node *check = head;
+        bool found = false;
+
+        while (check)
+        {
+            if (check == target)
+            {
+                found = true;
+                break;
+            }
+            check = check->next;
+        }
+
+        if (!found)
+            return;
+
+        if (head == target)
+        {
+            head = head->next;
+            return;
+        }
+
+        Node *cur = head;
+        while (cur->next && cur->next != target)
+            cur = cur->next;
+
+        if (cur->next == target)
+            cur->next = target->next;
+    }
+
+    void insertSorted(Node *t)
+    {
+        if (!head || t->a.t < head->a.t)
+        {
+            t->next = head;
+            head = t;
+            return;
+        }
+
+        Node *cur = head;
+        while (cur->next && !(t->a.t < cur->next->a.t))
+            cur = cur->next;
+
+        t->next = cur->next;
+        cur->next = t;
+    }
+
     void altermed(Stack &u)
     {
         if (hash.empty())
@@ -403,6 +472,8 @@ struct LinkedList
 
         auto &vec = hash[key];
 
+        vector<AlterRequest> pending;
+
         for (Node *r : vec)
         {
             r->a.disp();
@@ -416,132 +487,165 @@ struct LinkedList
             if (op != 'y' && op != 'Y')
                 continue;
 
-            c.OV = r->a;
+            AlterRequest req;
+            req.node = r;
 
             cout << "Change medicine name? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
             if (op == 'y' || op == 'Y')
             {
-                int oldQty = qty[key];
-
-                auto &oldVec = hash[key];
-                oldVec.erase(remove(oldVec.begin(), oldVec.end(), r), oldVec.end());
-
-                if (oldVec.empty())
-                {
-                    hash.erase(key);
-                    qty.erase(key);
-                }
-
                 cout << "Enter new name: ";
-                getline(cin, r->a.name);
-
-                auto newKey = make_pair(r->a.name, r->a.dosage);
-                hash[newKey].push_back(r);
-                qty[newKey] = oldQty;
-
-                key = newKey;
+                getline(cin, req.newName);
+                req.changeName = true;
             }
 
             cout << "Change time? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
             if (op == 'y' || op == 'Y')
             {
-                cout << "Enter hour and min: ";
-                cin >> r->a.t.h >> r->a.t.m;
+                cout << "Enter hour and minute: ";
+                cin >> req.newTime.h >> req.newTime.m;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                req.changeTime = true;
             }
 
             cout << "Change dosage? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
             if (op == 'y' || op == 'Y')
             {
-                int oldQty = qty[key];
-
-                auto &oldVec = hash[key];
-                oldVec.erase(remove(oldVec.begin(), oldVec.end(), r), oldVec.end());
-
-                if (oldVec.empty())
-                {
-                    hash.erase(key);
-                    qty.erase(key);
-                }
-
                 cout << "Enter new dosage: ";
-                getline(cin, r->a.dosage);
-
-                auto newKey = make_pair(r->a.name, r->a.dosage);
-                hash[newKey].push_back(r);
-                qty[newKey] = oldQty;
-
-                key = newKey;
+                getline(cin, req.newDosage);
+                req.changeDosage = true;
             }
 
             cout << "Change days? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
             if (op == 'y' || op == 'Y')
             {
-                r->a.dy.clear();
-                int ch;
-                cout << "1.Certain days 2.Daily: ";
-                cin >> ch;
+                req.changeDays = true;
+                req.newDays.clear();
 
-                if (ch == 1)
+                int choice;
+                cout << "1. Certain days  2. Daily: ";
+                cin >> choice;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                if (choice == 1)
                 {
                     char o;
                     for (int i = 1; i <= 7; i++)
                     {
                         cout << "Day " << i << "? (y/n): ";
                         cin >> o;
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
                         if (o == 'y' || o == 'Y')
-                            r->a.dy.push_back(i);
+                            req.newDays.push_back(i);
                     }
                 }
                 else
                 {
                     for (int i = 1; i <= 7; i++)
-                        r->a.dy.push_back(i);
+                        req.newDays.push_back(i);
                 }
             }
 
             cout << "Change quantity? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
             if (op == 'y' || op == 'Y')
             {
-                c.qb = qty[key];
-                int newQty;
                 cout << "Enter new quantity: ";
-                cin >> newQty;
-                qty[key] = newQty;
+                cin >> req.newQty;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                req.changeQty = true;
             }
 
             cout << "Change expiry date? (y/n): ";
             cin >> op;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
             if (op == 'y' || op == 'Y')
             {
                 int d, m, y;
                 cout << "Day Month Year: ";
                 cin >> d >> m >> y;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-                r->a.exp = Date(
-                    Date::isValid(d, m, y) ? d : 1,
-                    Date::isValid(d, m, y) ? m : 1,
-                    Date::isValid(d, m, y) ? y : 2000);
+                req.newExp = Date(d, m, y);
+                req.changeExp = true;
             }
 
-            c.NV = r->a;
-            u.push(c);
+            pending.push_back(req);
+        }
+
+        for (auto &req : pending)
+        {
+            Node *r = req.node;
+
+            auto oldKey = make_pair(r->a.name, r->a.dosage);
+
+            if (req.changeName)
+                r->a.name = req.newName;
+
+            if (req.changeDosage)
+                r->a.dosage = req.newDosage;
+
+            if (req.changeQty)
+                qty[oldKey] = req.newQty;
+
+            bool timeChanged = false;
+            if (req.changeTime)
+            {
+                if (!(req.newTime == r->a.t))
+                    timeChanged = true;
+
+                r->a.t = req.newTime;
+            }
+
+            if (req.changeDays)
+                r->a.dy = req.newDays;
+
+            if (req.changeExp)
+                r->a.exp = req.newExp;
+
+            auto newKey = make_pair(r->a.name, r->a.dosage);
+
+            if (timeChanged)
+            {
+                removeNode(r);
+                r->next = nullptr;
+                insertSorted(r);
+                auto &vec2 = hash[newKey];
+
+                sort(vec2.begin(), vec2.end(),
+                     [](Node *a, Node *b)
+                     {
+                         return a->a.t < b->a.t;
+                     });
+            }
+
+            if (newKey != oldKey)
+            {
+                int oldQuantity = qty[oldKey];
+                if (req.changeQty)
+                    qty[newKey] = req.newQty;
+                else
+                    qty[newKey] = oldQuantity;
+
+                auto &oldVec = hash[oldKey];
+                oldVec.erase(remove(oldVec.begin(), oldVec.end(), r), oldVec.end());
+
+                if (oldVec.empty())
+                {
+                    hash.erase(oldKey);
+                    qty.erase(oldKey);
+                }
+
+                hash[newKey].push_back(r);
+            }
         }
     }
 
