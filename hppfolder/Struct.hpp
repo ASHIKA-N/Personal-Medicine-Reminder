@@ -77,7 +77,12 @@ struct Date
         return (thisDate - otherDate).count();
     }
 
-    bool operator<=(const Date &other) const { return (year{y} / m / d) <= (year{other.y} / other.m / other.d); }
+    bool operator<=(const Date &other) const
+    {
+        sys_days thisDate = year{y} / month{static_cast<unsigned>(m)} / day{static_cast<unsigned>(d)};
+        sys_days otherDate = year{other.y} / month{static_cast<unsigned>(other.m)} / day{static_cast<unsigned>(other.d)};
+        return thisDate <= otherDate;
+    }
 };
 
 struct Med
@@ -96,10 +101,10 @@ struct Med
         dosage = d;
         t = Time(hour, min);
         dy = f.empty() ? vector<int>{1, 2, 3, 4, 5, 6, 7} : f;
-        exp = Date(
-            Date::isValid(day, month, year) ? day : 1,
-            Date::isValid(day, month, year) ? month : 1,
-            Date::isValid(day, month, year) ? year : 2000);
+        if (Date::isValid(day, month, year))
+            exp = Date(day, month, year);
+        else
+            exp = Date(1, 1, 2000);
     }
 
     void disp() const

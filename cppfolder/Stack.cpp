@@ -50,10 +50,10 @@ void Undo(Stack &u, Stack &r, LinkedList &L)
             else
                 prev->next = curr->next;
 
-            auto &vec = L.hash[name];
+            auto &vec = L.hash[{name, dosage}];
             vec.erase(remove(vec.begin(), vec.end(), curr), vec.end());
             if (vec.empty())
-                L.hash.erase(name);
+                L.hash.erase({name, dosage});
 
             auto key = make_pair(curr->a.name, curr->a.dosage);
 
@@ -100,7 +100,7 @@ void Undo(Stack &u, Stack &r, LinkedList &L)
                 curr->next = newNode;
             }
 
-            L.hash[newNode->a.name].push_back(newNode);
+            L.hash[{newNode->a.name, newNode->a.dosage}].push_back(newNode);
             L.qty[{newNode->a.name, newNode->a.dosage}] = a.qb;
             cout << "Undo delete -> Restored: " << newNode->a.name << " at ";
             newNode->a.t.disp();
@@ -137,7 +137,7 @@ void Undo(Stack &u, Stack &r, LinkedList &L)
                             curr->next = newNode2;
                         }
 
-                        L.hash[newNode2->a.name].push_back(newNode2);
+                        L.hash[{newNode2->a.name, newNode2->a.dosage}].push_back(newNode2);
                         L.qty[{newNode2->a.name, newNode2->a.dosage}] = x.qb;
                     }
                     cout << "All deleted items restored.\n";
@@ -153,13 +153,17 @@ void Undo(Stack &u, Stack &r, LinkedList &L)
             {
                 if (curr->a.name == a.NV.name && curr->a.t == a.NV.t)
                 {
-                    if (a.NV.name != a.OV.name)
+                    if (a.NV.name != a.OV.name || a.NV.dosage != a.OV.dosage)
                     {
-                        auto &oldVec = L.hash[a.NV.name];
+                        auto oldKey = make_pair(a.NV.name, a.NV.dosage);
+                        auto newKey = make_pair(a.OV.name, a.OV.dosage);
+
+                        auto &oldVec = L.hash[oldKey];
                         oldVec.erase(remove(oldVec.begin(), oldVec.end(), curr), oldVec.end());
                         if (oldVec.empty())
-                            L.hash.erase(a.NV.name);
-                        L.hash[a.OV.name].push_back(curr);
+                            L.hash.erase(oldKey);
+
+                        L.hash[newKey].push_back(curr);
                     }
 
                     auto oldKey = make_pair(a.OV.name, a.OV.dosage);
@@ -248,7 +252,7 @@ void Redo(Stack &r, Stack &u, LinkedList &L)
                 curr->next = newNode;
             }
 
-            L.hash[newNode->a.name].push_back(newNode);
+            L.hash[{newNode->a.name, newNode->a.dosage}].push_back(newNode);
             L.qty[{newNode->a.name, newNode->a.dosage}] = a.qb;
             cout << "Redo insert -> Inserted: " << newNode->a.name << " at ";
             newNode->a.t.disp();
@@ -273,10 +277,10 @@ void Redo(Stack &r, Stack &u, LinkedList &L)
             else
                 prev->next = curr->next;
 
-            auto &vec = L.hash[curr->a.name];
+            auto &vec = L.hash[{curr->a.name, curr->a.dosage}];
             vec.erase(remove(vec.begin(), vec.end(), curr), vec.end());
             if (vec.empty())
-                L.hash.erase(curr->a.name);
+                L.hash.erase({curr->a.name, curr->a.dosage});
 
             auto key = make_pair(curr->a.name, curr->a.dosage);
             bool stillExists = false;
@@ -326,10 +330,10 @@ void Redo(Stack &r, Stack &u, LinkedList &L)
                         else
                             prev2->next = curr2->next;
 
-                        auto &vec2 = L.hash[curr2->a.name];
+                        auto &vec2 = L.hash[{curr2->a.name, curr2->a.dosage}];
                         vec2.erase(remove(vec2.begin(), vec2.end(), curr2), vec2.end());
                         if (vec2.empty())
-                            L.hash.erase(curr2->a.name);
+                            L.hash.erase({curr2->a.name, curr2->a.dosage});
 
                         auto key = make_pair(curr2->a.name, curr2->a.dosage);
                         stillExists = false;
@@ -362,13 +366,17 @@ void Redo(Stack &r, Stack &u, LinkedList &L)
             {
                 if (curr->a.name == a.OV.name && curr->a.t == a.OV.t)
                 {
-                    if (a.OV.name != a.NV.name)
+                    if (a.OV.name != a.NV.name || a.OV.dosage != a.NV.dosage)
                     {
-                        auto &oldVec = L.hash[a.OV.name];
+                        auto oldKey = make_pair(a.OV.name, a.OV.dosage);
+                        auto newKey = make_pair(a.NV.name, a.NV.dosage);
+
+                        auto &oldVec = L.hash[oldKey];
                         oldVec.erase(remove(oldVec.begin(), oldVec.end(), curr), oldVec.end());
                         if (oldVec.empty())
-                            L.hash.erase(a.OV.name);
-                        L.hash[a.NV.name].push_back(curr);
+                            L.hash.erase(oldKey);
+
+                        L.hash[newKey].push_back(curr);
                     }
 
                     auto oldKey = make_pair(a.OV.name, a.OV.dosage);

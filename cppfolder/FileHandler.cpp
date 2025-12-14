@@ -72,7 +72,7 @@ void loadFromFile(LinkedList &L, const string &username)
             r->next = node;
         }
 
-        L.hash[m.name].push_back(node);
+        L.hash[{m.name, m.dosage}].push_back(node);
         L.qty[{m.name, m.dosage}] = qty;
     }
 

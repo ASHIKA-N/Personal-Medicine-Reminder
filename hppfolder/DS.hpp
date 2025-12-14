@@ -316,6 +316,17 @@ struct LinkedList
             c.OV = temp->a;
             c.qb = qty[{temp->a.name, temp->a.dosage}];
             u.push(c);
+            auto key = make_pair(temp->a.name, temp->a.dosage);
+            auto &vec = hash[key];
+
+            vec.erase(remove(vec.begin(), vec.end(), temp), vec.end());
+
+            if (vec.empty())
+            {
+                hash.erase(key);
+                qty.erase(key);
+            }
+
             delete temp;
         }
 
@@ -330,6 +341,17 @@ struct LinkedList
                 c.OV = temp->a;
                 c.qb = qty[{temp->a.name, temp->a.dosage}];
                 u.push(c);
+                auto key = make_pair(temp->a.name, temp->a.dosage);
+                auto &vec = hash[key];
+
+                vec.erase(remove(vec.begin(), vec.end(), temp), vec.end());
+
+                if (vec.empty())
+                {
+                    hash.erase(key);
+                    qty.erase(key);
+                }
+
                 delete temp;
             }
             else
