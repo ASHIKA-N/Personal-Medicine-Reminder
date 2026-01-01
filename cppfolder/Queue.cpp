@@ -7,6 +7,7 @@
 #include <fstream>
 #include "../hppfolder/Queue.hpp"
 
+static const string MDATA_DIR = "missed_data";
 using namespace std;
 
 int getTodayDayNumber()
@@ -58,7 +59,7 @@ void reminderCheck(Queue &todayQ, LinkedList &L, const string &username)
     bool eFlag = false;
     vector<Med> missed;
 
-    string logFileName = username + "_missed_log.txt";
+    string logFileName = MDATA_DIR + "/" + username + "_missed_log.txt";
 
     ofstream logFile(logFileName, ios::app);
     if (!logFile)

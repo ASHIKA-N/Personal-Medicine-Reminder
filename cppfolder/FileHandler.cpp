@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <sstream>
 
+static const string DATA_DIR = "data";
 using namespace std;
 
 static string sanitize(const string &s)
@@ -16,7 +17,7 @@ static string sanitize(const string &s)
 
 void loadFromFile(LinkedList &L, const string &username)
 {
-    string filename = username + "_data.txt";
+    string filename = DATA_DIR + "/" + username + "_data.txt";
     ifstream file(filename);
     if (!file.is_open())
     {
@@ -82,8 +83,8 @@ void loadFromFile(LinkedList &L, const string &username)
 
 void commitToFile(const LinkedList &L, const string &username)
 {
-    string mainFile = username + "_data.txt";
-    string tempFile = username + "_temp.txt";
+    string mainFile = DATA_DIR + "/" + username + "_data.txt";
+    string tempFile = DATA_DIR + "/" + username + "_temp.txt";
     ofstream out(tempFile, ios::trunc);
     if (!out.is_open())
     {
