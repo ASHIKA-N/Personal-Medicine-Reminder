@@ -1,5 +1,7 @@
 *.exe
 *.out
 *.o
-*.txt
+data/
+missed_data/
+login_data/
 build/
