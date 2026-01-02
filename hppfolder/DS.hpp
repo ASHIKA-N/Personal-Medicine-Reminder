@@ -10,23 +10,6 @@
 
 using namespace std;
 
-struct AlterRequest
-{
-    Node *node;
-    bool changeName = false;
-    bool changeDosage = false;
-    bool changeQty = false;
-    string newName;
-    string newDosage;
-    int newQty;
-    bool changeTime = false;
-    Time newTime;
-    bool changeDays = false;
-    vector<int> newDays;
-    bool changeExp = false;
-    Date newExp;
-};
-
 class Stack
 {
     vector<Action> a;
@@ -106,18 +89,35 @@ public:
     int size() const { return a.size(); }
 };
 
-struct Node
-{
-    Med a;
-    Node *next;
-};
-
 struct PairHash
 {
     size_t operator()(const pair<string, string> &p) const noexcept
     {
         return hash<string>()(p.first) ^ (hash<string>()(p.second) << 1);
     }
+};
+
+struct Node
+{
+    Med a;
+    Node *next;
+};
+
+struct AlterRequest
+{
+    Node *node;
+    bool changeName = false;
+    bool changeDosage = false;
+    bool changeQty = false;
+    string newName;
+    string newDosage;
+    int newQty;
+    bool changeTime = false;
+    Time newTime;
+    bool changeDays = false;
+    vector<int> newDays;
+    bool changeExp = false;
+    Date newExp;
 };
 
 struct LinkedList

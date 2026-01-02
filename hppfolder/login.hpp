@@ -3,8 +3,8 @@
 #include <fstream>
 #include <string>
 #include <functional>
-static const string LDATA_DIR = "login_data";
 using namespace std;
+static const string LDATA_DIR = "login_data";
 class Login
 {
 private:

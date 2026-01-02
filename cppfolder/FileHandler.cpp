@@ -2,9 +2,8 @@
 #include "../hppfolder/DS.hpp"
 #include <filesystem>
 #include <sstream>
-
-static const string DATA_DIR = "data";
 using namespace std;
+static const string DATA_DIR = "data";
 
 static string sanitize(const string &s)
 {

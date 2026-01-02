@@ -7,8 +7,8 @@
 #include <fstream>
 #include "../hppfolder/Queue.hpp"
 
-static const string MDATA_DIR = "missed_data";
 using namespace std;
+static const string MDATA_DIR = "missed_data";
 
 int getTodayDayNumber()
 {
