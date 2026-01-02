@@ -73,9 +73,17 @@ bool Login::login()
     ifstream fileuser(file);
     if (!fileuser.is_open())
     {
-        cout << "No data found!\n";
+        cout << "No users registered yet. Please register first.\n";
         return false;
     }
+
+    fileuser.seekg(0, ios::end);
+    if (fileuser.tellg() == 0)
+    {
+        cout << "No users registered yet. Please register first.\n";
+        return false;
+    }
+    fileuser.seekg(0, ios::beg);
 
     string u, v;
     while (fileuser >> u >> v)
