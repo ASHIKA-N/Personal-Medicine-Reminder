@@ -1,7 +1,7 @@
 *.exe
 *.out
 *.o
-.vscode
+.vscode/
 data/
 missed_data/
 login_data/
