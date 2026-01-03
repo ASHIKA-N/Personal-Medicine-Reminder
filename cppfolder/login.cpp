@@ -43,18 +43,6 @@ bool Login::regist()
         filecheck.close();
     }
 
-    string u, v;
-    while (filecheck >> u >> v)
-    {
-        if (u == user)
-        {
-            cout << "Username already exists! Try a different one.\n";
-            filecheck.close();
-            return false;
-        }
-    }
-    filecheck.close();
-
     ofstream filereg(file, ios::app);
     if (!filereg.is_open())
     {
