@@ -6,7 +6,7 @@
 using namespace std;
 using namespace std::chrono;
 
-void expiry(LinkedList *L, int e)
+void expiry(LinkedList *L, int exp)
 {
     if (!L || !L->head)
     {
@@ -22,7 +22,7 @@ void expiry(LinkedList *L, int e)
     currentDate.m = static_cast<unsigned>(ymd.month());
     currentDate.y = static_cast<int>(ymd.year());
 
-    Stack dummy;
+    Stack dummy; // deletion during expiry should not affect undo history
     bool none = true;
     while (n)
     {
@@ -33,13 +33,18 @@ void expiry(LinkedList *L, int e)
         if (diff <= 0)
         {
             none = false;
-            cout << "\nMedicine expired\n";
+            cout << "\nMedicine has expired\n";
             cout << "Name: " << n->a.name << " at ";
             n->a.t.disp();
             cout << endl;
             cout << "Do you need to refill (y/n): ";
             cin >> opt;
-            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            if (cin.fail())
+            {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                opt = 'n';
+            }
             if (opt == 'y' || opt == 'Y')
             {
                 L->updqty(n->a.name, n->a.dosage);
@@ -53,7 +58,7 @@ void expiry(LinkedList *L, int e)
                 L->del(n->a.name, n->a.t, dummy);
             }
         }
-        else if (diff <= e)
+        else if (diff <= exp)
         {
             none = false;
             cout << "\nMedicine will expire in " << diff << " day(s):\n";
@@ -74,7 +79,7 @@ void expiry(LinkedList *L, int e)
     }
     if (none)
     {
-        cout << "No medicines expiring within " << e << " days.\n";
+        cout << "No medicines expiring within " << exp << " days.\n";
     }
     cout << "\nExpiry check complete.\n";
 }
