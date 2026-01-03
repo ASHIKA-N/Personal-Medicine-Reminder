@@ -28,10 +28,19 @@ bool Login::regist()
     string hashpass = hashPassword(pass);
 
     ifstream filecheck(file);
-    if (!filecheck.is_open())
+    if (filecheck.is_open())
     {
-        cout << "Error: Could not open user file for reading.\n";
-        return false;
+        string u, v;
+        while (filecheck >> u >> v)
+        {
+            if (u == user)
+            {
+                cout << "Username already exists! Try a different one.\n";
+                filecheck.close();
+                return false;
+            }
+        }
+        filecheck.close();
     }
 
     string u, v;
