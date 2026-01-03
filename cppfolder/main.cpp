@@ -7,6 +7,7 @@
 #include "../hppfolder/Stack.hpp"
 #include "../hppfolder/Login.hpp"
 using namespace std;
+// Main driver: handles authentication, menu flow, and session lifecycle
 
 void menu()
 {
@@ -77,6 +78,13 @@ int main()
         menu();
         cout << "Enter choice: ";
         cin >> ch;
+        if (cin.fail())
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input. Please enter a number.\n";
+            continue;
+        }
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         switch (ch)
