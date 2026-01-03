@@ -14,13 +14,13 @@ string Login::hashPassword(const string &password)
     return to_string(hashing(password));
 }
 
-void Login::regist()
+bool Login::regist()
 {
-
     string user, pass;
     cout << "Enter Username: ";
     cin >> user;
     user = trim(user);
+
     cout << "Enter Password: ";
     cin >> pass;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -31,8 +31,9 @@ void Login::regist()
     if (!filecheck.is_open())
     {
         cout << "Error: Could not open user file for reading.\n";
-        return;
+        return false;
     }
+
     string u, v;
     while (filecheck >> u >> v)
     {
@@ -40,22 +41,24 @@ void Login::regist()
         {
             cout << "Username already exists! Try a different one.\n";
             filecheck.close();
-            return;
+            return false;
         }
     }
     filecheck.close();
 
     ofstream filereg(file, ios::app);
-    if (filereg.is_open())
-    {
-        filereg << user << " " << hashpass << endl;
-        cout << "Registered successfully!\n";
-        filereg.close();
-    }
-    else
+    if (!filereg.is_open())
     {
         cout << "Could not open file!\n";
+        return false;
     }
+
+    filereg << user << " " << hashpass << endl;
+    filereg.close();
+
+    currentUser = user;
+    cout << "Registered & logged in successfully!\n";
+    return true;
 }
 
 bool Login::login()

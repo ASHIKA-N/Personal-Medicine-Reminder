@@ -27,36 +27,49 @@ void menu()
 int main()
 {
     int ch, ch1;
-    bool login = false;
     LinkedList L;
     Queue todayQueue;
     Stack undo, redo;
     Login log;
-    cout << "1.Login\n2.Register\n Choice: ";
-    cin >> ch1;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    if (ch1 == 1)
-    {
-        login = log.login();
-    }
-    else if (ch1 == 2)
-    {
-        log.regist();
-        login = log.login();
-    }
     int attempts = 0;
+    bool login = false;
+
     while (attempts < 3 && !login)
     {
-        cout << "Login failed. Try again.\n";
-        login = log.login();
+        if (attempts == 0)
+        {
+            cout << "1.Login\n2.Register\nChoice: ";
+            cin >> ch1;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+            if (ch1 == 1)
+            {
+                login = log.login();
+            }
+            else if (ch1 == 2)
+            {
+                login = log.regist();
+            }
+            else
+            {
+                cout << "Invalid option.\n";
+                attempts++;
+                continue;
+            }
+        }
+        else
+        {
+            cout << "Login failed. Try again.\n";
+            login = log.login();
+        }
+
         attempts++;
     }
     if (!login)
     {
-        cout << "Invalid option/Too many failed attempts. Exiting...\n";
+        cout << "Maximum login attempts exceeded. Exiting program.\n";
         return 0;
     }
-
     loadFromFile(L, log.getUser());
 
     while (true)

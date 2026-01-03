@@ -14,7 +14,7 @@ private:
     static string trim(const string &s);
 
 public:
-    void regist();
+    bool regist();
     bool login();
     string getUser() const { return currentUser; }
 };
