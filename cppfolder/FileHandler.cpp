@@ -30,6 +30,8 @@ void loadFromFile(LinkedList &L, const string &username)
     {
         if (line.empty())
             continue;
+        // File format:
+        // name|dosage|quantity|HH MM|DD MM YYYY|day1,day2,...
 
         stringstream ss(line);
         Med m;
