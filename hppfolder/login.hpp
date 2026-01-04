@@ -12,9 +12,12 @@ private:
     string currentUser = "";
     string hashPassword(const string &password);
     static string trim(const string &s);
+    int remindQty;
 
 public:
     bool regist();
     bool login();
     string getUser() const { return currentUser; }
+    int getRemindQty() const { return remindQty; }
+    void changeRemindQty();
 };

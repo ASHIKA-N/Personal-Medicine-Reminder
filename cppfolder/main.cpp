@@ -22,7 +22,8 @@ void menu()
     cout << "7. Undo Last Operation\n";
     cout << "8. Redo Last Undone Operation\n";
     cout << "9. View Quantity\n";
-    cout << "10. Exit\n";
+    cout << "10. Change Reminder Quantity\n";
+    cout << "11. Exit\n";
 }
 
 int main()
@@ -172,6 +173,9 @@ int main()
             L.viewqty();
             break;
         case 10:
+            log.changeRemindQty();
+            break;
+        case 11:
         {
             int days;
             cout << "\n--- Expiry Check before Exit ---\n";
@@ -187,7 +191,7 @@ int main()
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             expiry(&L, days);
             Queue todayQ = buildTodayQueue(L);
-            reminderCheck(todayQ, L, log.getUser());
+            reminderCheck(todayQ, L, log.getUser(), log.getRemindQty());
             commitToFile(L, log.getUser());
             cout << "Session Complete\nExiting\n";
             return 0;

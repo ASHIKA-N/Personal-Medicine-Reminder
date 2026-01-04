@@ -17,12 +17,23 @@ string Login::hashPassword(const string &password)
 bool Login::regist()
 {
     string user, pass;
+    int rq = 0;
     cout << "Enter Username: ";
     cin >> user;
     user = trim(user);
 
     cout << "Enter Password: ";
     cin >> pass;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    cout << "Remind me when any medicine quantity is <= (0 for only zero): ";
+    if (!(cin >> rq) || rq < 0)
+    {
+        cout << "Invalid input. Using default reminder = 0\n";
+        rq = 0;
+        cin.clear();
+    }
+
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
     string hashpass = hashPassword(pass);
@@ -100,4 +111,45 @@ bool Login::login()
     fileuser.close();
     cout << "Invalid credentials!\n";
     return false;
+}
+
+void Login::changeRemindQty()
+{
+    int newQty;
+
+    cout << "Current reminder threshold: " << remindQty << endl;
+    cout << "Enter new reminder quantity (>= 0): ";
+    cin >> newQty;
+
+    if (!cin || newQty < 0)
+    {
+        cout << "Invalid value. Reminder not changed.\n";
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        return;
+    }
+
+    remindQty = newQty;
+
+    ifstream fin(file);
+    ofstream fout(LDATA_DIR + "/temp.txt");
+
+    string u, v;
+    int r;
+
+    while (fin >> u >> v >> r)
+    {
+        if (u == currentUser)
+            fout << u << " " << v << " " << remindQty << endl;
+        else
+            fout << u << " " << v << " " << r << endl;
+    }
+
+    fin.close();
+    fout.close();
+
+    remove(file.c_str());
+    rename((LDATA_DIR + "/temp.txt").c_str(), file.c_str());
+
+    cout << "Reminder updated successfully.\n";
 }

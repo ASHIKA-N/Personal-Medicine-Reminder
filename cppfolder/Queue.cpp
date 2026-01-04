@@ -54,7 +54,7 @@ bool exitRequested()
     return false;
 }
 
-void reminderCheck(Queue &todayQ, LinkedList &L, const string &username)
+void reminderCheck(Queue &todayQ, LinkedList &L, const string &username, int remindQty)
 {
     bool eFlag = false;
     vector<Med> missed;
@@ -104,9 +104,31 @@ void reminderCheck(Queue &todayQ, LinkedList &L, const string &username)
 
             if (taken == 'y')
             {
-                L.redqty(m.name, m.dosage);
+                int remaining = L.redqty(m.name, m.dosage);
                 todayQ.dequeue();
                 cout << "Medicine marked as taken.\n";
+
+                if (remaining == -1)
+                    cout << "Error: quantity record missing. Skipping stock check.\n";
+
+                if (remaining <= remindQty)
+                {
+                    cout << "\n[STOCK REMINDER]\n";
+                    cout << "Medicine: " << m.name << " (" << m.dosage << ")\n";
+                    cout << "Remaining Quantity: " << remaining << endl;
+                    cout << "Reminder Threshold: " << remindQty << endl;
+
+                    if (remaining == 0)
+                    {
+                        char ch;
+                        cout << "Stock depleted. Would you like to restock now? (y/n): ";
+                        cin >> ch;
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                        if (tolower(ch) == 'y')
+                            L.updqty(m.name, m.dosage);
+                    }
+                }
             }
             else if (taken == 'e')
             {
@@ -186,4 +208,6 @@ void reminderCheck(Queue &todayQ, LinkedList &L, const string &username)
     else
         cout << "\nSession ended. " << todayQ.size()
              << " medicine(s) still remaining today.\n";
+    logFile << "--- End of Missed Medicines ---\n";
+    logFile.close();
 }

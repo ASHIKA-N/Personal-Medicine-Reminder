@@ -689,31 +689,29 @@ struct LinkedList
         cout << "----------------------------\n";
     }
 
-    void redqty(const string &name, const string &dosage)
+    int redqty(const string &name, const string &dosage)
     {
-        if (qty.find({name, dosage}) == qty.end())
+        auto key = make_pair(name, dosage);
+
+        if (qty.find(key) == qty.end())
         {
-            cout << "Medicine not found in quantity records. Cannot restock.\n";
-            return;
-        }
-        if (qty[{name, dosage}] == 0)
-        {
-            cout << "Medicine already depleted. Restocking...\n";
-            updqty(name, dosage);
-            return;
+            cout << "Medicine not found in quantity records.\n";
+            return -1;
         }
 
-        qty[{name, dosage}] = max(0, qty[{name, dosage}] - 1);
+        if (qty[key] == 0)
+        {
+            cout << "Medicine already depleted.\n";
+            return 0;
+        }
 
-        if (qty[{name, dosage}] == 0)
-        {
-            cout << "Medicine depleted. Auto restocking...\n";
-            updqty(name, dosage);
-        }
-        else
-        {
-            cout << "Medicine " << name << " (dosage: " << dosage << ") quantity reduced to " << qty[{name, dosage}] << endl;
-        }
+        qty[key]--;
+
+        cout << "Medicine " << name
+             << " (dosage: " << dosage
+             << ") quantity reduced to " << qty[key] << endl;
+
+        return qty[key];
     }
 
     void updqty(const string &name, const string &dosage)
