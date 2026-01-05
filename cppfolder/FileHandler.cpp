@@ -134,3 +134,42 @@ void commitToFile(const LinkedList &L, const string &username)
             std::filesystem::remove(tempFile);
     }
 }
+
+void clearFileData(const string &username)
+{
+    string mainFile = DATA_DIR + "/" + username + "_data.txt";
+
+    try
+    {
+        if (std::filesystem::exists(mainFile))
+        {
+            std::filesystem::remove(mainFile);
+            cout << "[Info] User data cleared successfully.\n";
+        }
+        else
+        {
+            cout << "[Info] No data file to clear.\n";
+        }
+    }
+    catch (const std::filesystem::filesystem_error &e)
+    {
+        cerr << "[Error] Unable to clear data file: " << e.what() << endl;
+    }
+}
+
+void clearUserData(const string &username, LinkedList &L)
+{
+    clearFileData(username);
+
+    while (L.head)
+    {
+        Node *tmp = L.head;
+        L.head = L.head->next;
+        delete tmp;
+    }
+
+    L.hash.clear();
+    L.qty.clear();
+
+    cout << "[Info] In-memory data cleared.\n";
+}

@@ -23,7 +23,8 @@ void menu()
     cout << "8. Redo Last Undone Operation\n";
     cout << "9. View Quantity\n";
     cout << "10. Change Reminder Quantity\n";
-    cout << "11. Exit\n";
+    cout << "11. Delete All Data for Current User (IRREVERSIBLE)\n";
+    cout << "12. Exit\n";
 }
 
 int main()
@@ -176,6 +177,23 @@ int main()
             log.changeRemindQty();
             break;
         case 11:
+        {
+            char confirm;
+            cout << "Are you sure you want to delete ALL your data? This action is IRREVERSIBLE. (y/n): ";
+            cin >> confirm;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            if (confirm == 'y' || confirm == 'Y')
+            {
+                clearUserData(log.getUser(), L);
+                cout << "All your data has been deleted.\n";
+            }
+            else
+            {
+                cout << "Data deletion cancelled.\n";
+            }
+            break;
+        }
+        case 12:
         {
             int days;
             cout << "\n--- Expiry Check before Exit ---\n";
