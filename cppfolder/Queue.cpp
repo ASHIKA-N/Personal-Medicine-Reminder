@@ -139,20 +139,23 @@ void reminderCheck(Queue &todayQ, LinkedList &L, const string &username, int rem
             {
                 int skipCount = 0;
                 cout << "Snoozed! Will remind again after 20 minutes. Press 'e' anytime to exit.\n";
-                for (int minute = 0; minute < 20 && !eFlag && skipCount < 3; ++minute)
+                while (skipCount < 3)
                 {
-                    for (int sec = 0; sec < 60; ++sec)
+                    for (int minute = 0; minute < 20 && !eFlag; ++minute)
                     {
-                        if (exitRequested())
+                        for (int sec = 0; sec < 60; ++sec)
                         {
-                            cout << "\nExiting snooze early.\n";
-                            eFlag = true;
-                            break;
+                            if (exitRequested())
+                            {
+                                cout << "\nExiting snooze early.\n";
+                                eFlag = true;
+                                break;
+                            }
+                            this_thread::sleep_for(chrono::seconds(1));
                         }
-                        this_thread::sleep_for(chrono::seconds(1));
+                        if (!eFlag)
+                            cout << (20 - minute - 1) << " minutes left...\n";
                     }
-                    if (!eFlag)
-                        cout << (20 - minute - 1) << " minutes left...\n";
                     ++skipCount;
                 }
 

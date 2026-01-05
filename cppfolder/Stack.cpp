@@ -323,7 +323,10 @@ void Redo(Stack &r, Stack &u, LinkedList &L)
                             curr2 = curr2->next;
                         }
                         if (!curr2)
+                        {
+                            cout << "Redo skipped: item no longer exists.\n";
                             continue;
+                        }
 
                         if (!prev2)
                             L.head = curr2->next;
@@ -413,7 +416,13 @@ void Redo(Stack &r, Stack &u, LinkedList &L)
         }
         cout << "Continue redoing? (y/n): ";
         cin >> ch;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        if (cin.fail())
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            break;
+        }
+
         if (ch != 'y' && ch != 'Y')
             cont = false;
     }
