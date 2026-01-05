@@ -68,7 +68,17 @@ void expiry(LinkedList *L, int exp)
             cout << endl;
             cout << "Do you need to refill (y/n): ";
             cin >> opt;
-            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            if (cin.fail())
+            {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                opt = 'n';
+            }
+            else
+            {
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+
             if (opt == 'y' || opt == 'Y')
             {
                 L->updqty(n->a.name, n->a.dosage);
