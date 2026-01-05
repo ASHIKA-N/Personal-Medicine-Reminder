@@ -41,8 +41,8 @@ bool Login::regist()
     ifstream filecheck(file);
     if (filecheck.is_open())
     {
-        string u, v;
-        while (filecheck >> u >> v)
+        string u, v, r;
+        while (filecheck >> u >> v >> r)
         {
             if (u == user)
             {
@@ -61,7 +61,7 @@ bool Login::regist()
         return false;
     }
 
-    filereg << user << " " << hashpass << endl;
+    filereg << user << " " << hashpass << " " << rq << endl;
     filereg.close();
 
     currentUser = user;
@@ -96,12 +96,13 @@ bool Login::login()
     }
     fileuser.seekg(0, ios::beg);
 
-    string u, v;
-    while (fileuser >> u >> v)
+    string u, v, r;
+    while (fileuser >> u >> v >> r)
     {
         if (u == user && v == hashpass)
         {
             cout << "Login successful!\n";
+            remindQty = stoi(r);
             currentUser = user;
             fileuser.close();
             return true;
@@ -133,6 +134,12 @@ void Login::changeRemindQty()
 
     ifstream fin(file);
     ofstream fout(LDATA_DIR + "/temp.txt");
+
+    if (!fin.is_open() || !fout.is_open())
+    {
+        cout << "Error updating reminder data.\n";
+        return;
+    }
 
     string u, v;
     int r;

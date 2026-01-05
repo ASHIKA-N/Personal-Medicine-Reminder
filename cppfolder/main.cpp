@@ -63,10 +63,9 @@ int main()
         else
         {
             cout << "Login failed. Try again.\n";
+            attempts++;
             login = log.login();
         }
-
-        attempts++;
     }
     if (!login)
     {
@@ -186,6 +185,8 @@ int main()
             {
                 clearUserData(log.getUser(), L);
                 cout << "All your data has been deleted.\n";
+                undo.clear();
+                redo.clear();
             }
             else
             {
@@ -207,9 +208,12 @@ int main()
                 cin >> days;
             }
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            expiry(&L, days);
-            Queue todayQ = buildTodayQueue(L);
-            reminderCheck(todayQ, L, log.getUser(), log.getRemindQty());
+            if (L.head)
+            {
+                expiry(&L, days);
+                Queue todayQ = buildTodayQueue(L);
+                reminderCheck(todayQ, L, log.getUser(), log.getRemindQty());
+            }
             commitToFile(L, log.getUser());
             cout << "Session Complete\nExiting\n";
             return 0;
