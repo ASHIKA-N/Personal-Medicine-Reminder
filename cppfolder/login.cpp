@@ -1,4 +1,5 @@
 #include "../hppfolder/Login.hpp"
+#include <filesystem>
 #include <limits>
 
 string Login::trim(const string &s)
@@ -16,6 +17,7 @@ string Login::hashPassword(const string &password)
 
 bool Login::regist()
 {
+    std::filesystem::create_directories(LDATA_DIR);
     string user, pass;
     int rq = 0;
     cout << "Enter Username: ";
@@ -102,7 +104,15 @@ bool Login::login()
         if (u == user && v == hashpass)
         {
             cout << "Login successful!\n";
-            remindQty = stoi(r);
+            try
+            {
+                remindQty = stoi(r);
+            }
+            catch (...)
+            {
+                remindQty = 0;
+            }
+
             currentUser = user;
             fileuser.close();
             return true;

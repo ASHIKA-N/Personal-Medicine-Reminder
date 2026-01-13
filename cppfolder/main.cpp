@@ -66,6 +66,9 @@ int main()
             attempts++;
             login = log.login();
         }
+
+        if (!login)
+            attempts++;
     }
     if (!login)
     {

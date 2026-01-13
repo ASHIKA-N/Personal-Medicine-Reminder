@@ -5,6 +5,7 @@
 #include <limits>
 #include <algorithm>
 #include <fstream>
+#include <filesystem>
 #include "../hppfolder/Queue.hpp"
 
 using namespace std;
@@ -56,6 +57,7 @@ bool exitRequested()
 
 void reminderCheck(Queue &todayQ, LinkedList &L, const string &username, int remindQty)
 {
+    std::filesystem::create_directories(MDATA_DIR);
     bool eFlag = false;
     vector<Med> missed;
 
@@ -105,8 +107,15 @@ void reminderCheck(Queue &todayQ, LinkedList &L, const string &username, int rem
             if (taken == 'y')
             {
                 int remaining = L.redqty(m.name, m.dosage);
-                todayQ.dequeue();
-                cout << "Medicine marked as taken.\n";
+                if (remaining == 0)
+                {
+                    cout << "Cannot mark as taken. Stock is empty.\n";
+                }
+                else
+                {
+                    todayQ.dequeue();
+                    cout << "Medicine marked as taken.\n";
+                }
 
                 if (remaining == -1)
                     cout << "Error: quantity record missing. Skipping stock check.\n";
