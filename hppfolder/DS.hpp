@@ -53,6 +53,7 @@ public:
 class Queue
 {
     vector<Med> a;
+    int frontIndex = 0;
 
 public:
     Queue(int s = 0)
@@ -61,7 +62,10 @@ public:
             a.reserve(s);
     }
 
-    void enqueue(const Med &v) { a.push_back(v); }
+    void enqueue(const Med &v)
+    {
+        a.push_back(v);
+    }
 
     Med dequeue()
     {
@@ -70,9 +74,8 @@ public:
             cout << "Queue Underflow\n";
             return Med();
         }
-        Med v = a.front();
-        a.erase(a.begin());
-        return v;
+
+        return a[frontIndex++];
     }
 
     Med peek()
@@ -82,11 +85,25 @@ public:
             cout << "Queue Underflow\n";
             return Med();
         }
-        return a.front();
+
+        return a[frontIndex];
     }
 
-    bool empty() const { return a.empty(); }
-    int size() const { return a.size(); }
+    bool empty() const
+    {
+        return frontIndex >= a.size();
+    }
+
+    int size() const
+    {
+        return a.size() - frontIndex;
+    }
+
+    void clear()
+    {
+        a.clear();
+        frontIndex = 0;
+    }
 };
 
 struct PairHash
@@ -493,7 +510,6 @@ struct LinkedList
         }
 
         auto &vec = hash[key];
-
         vector<AlterRequest> pending;
 
         for (Node *r : vec)
@@ -606,17 +622,15 @@ struct LinkedList
         for (auto &req : pending)
         {
             Node *r = req.node;
-
             auto oldKey = make_pair(r->a.name, r->a.dosage);
+
+            int finalQty = req.changeQty ? req.newQty : qty[oldKey];
 
             if (req.changeName)
                 r->a.name = req.newName;
 
             if (req.changeDosage)
                 r->a.dosage = req.newDosage;
-
-            if (req.changeQty)
-                qty[oldKey] = req.newQty;
 
             bool timeChanged = false;
             if (req.changeTime)
@@ -640,8 +654,8 @@ struct LinkedList
                 removeNode(r);
                 r->next = nullptr;
                 insertSorted(r);
-                auto &vec2 = hash[newKey];
 
+                auto &vec2 = hash[newKey];
                 sort(vec2.begin(), vec2.end(),
                      [](Node *a, Node *b)
                      {
@@ -651,11 +665,7 @@ struct LinkedList
 
             if (newKey != oldKey)
             {
-                int oldQuantity = qty[oldKey];
-                if (req.changeQty)
-                    qty[newKey] = req.newQty;
-                else
-                    qty[newKey] = oldQuantity;
+                qty[newKey] = finalQty;
 
                 auto &oldVec = hash[oldKey];
                 oldVec.erase(remove(oldVec.begin(), oldVec.end(), r), oldVec.end());
@@ -667,6 +677,10 @@ struct LinkedList
                 }
 
                 hash[newKey].push_back(r);
+            }
+            else if (req.changeQty)
+            {
+                qty[oldKey] = finalQty;
             }
         }
     }

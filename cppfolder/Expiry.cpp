@@ -82,6 +82,19 @@ void expiry(LinkedList *L, int exp)
             if (opt == 'y' || opt == 'Y')
             {
                 L->updqty(n->a.name, n->a.dosage);
+                cout << "Enter new expiry date (dd mm yyyy): ";
+                cin >> n->a.exp.d >> n->a.exp.m >> n->a.exp.y;
+
+                if (cin.fail())
+                {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid date. Expiry not updated.\n";
+                }
+                else
+                {
+                    cout << "Expiry date updated.\n";
+                }
             }
         }
 

@@ -2,7 +2,9 @@
 #include "../hppfolder/DS.hpp"
 #include <filesystem>
 #include <sstream>
+
 using namespace std;
+
 static const string DATA_DIR = "data";
 
 static string sanitize(const string &s)
@@ -16,8 +18,11 @@ static string sanitize(const string &s)
 
 void loadFromFile(LinkedList &L, const string &username)
 {
+    std::filesystem::create_directories(DATA_DIR);
+
     string filename = DATA_DIR + "/" + username + "_data.txt";
     ifstream file(filename);
+
     if (!file.is_open())
     {
         cout << "[Info] No medicine file for " << username
@@ -26,56 +31,64 @@ void loadFromFile(LinkedList &L, const string &username)
     }
 
     string line;
-    while (getline(file, line))
+
+    try
     {
-        if (line.empty())
-            continue;
-        // File format:
-        // name|dosage|quantity|HH MM|DD MM YYYY|day1,day2,...
-
-        stringstream ss(line);
-        Med m;
-        string qtyStr, timeStr, expStr, daysStr;
-
-        getline(ss, m.name, '|');
-        getline(ss, m.dosage, '|');
-        getline(ss, qtyStr, '|');
-        getline(ss, timeStr, '|');
-        getline(ss, expStr, '|');
-        getline(ss, daysStr, '|');
-
-        int qty = 0;
-        stringstream(qtyStr) >> qty;
-        stringstream(timeStr) >> m.t.h >> m.t.m;
-        stringstream(expStr) >> m.exp.d >> m.exp.m >> m.exp.y;
-
-        m.dy.clear();
-        string num;
-        stringstream ds(daysStr);
-        while (getline(ds, num, ','))
+        while (getline(file, line))
         {
-            if (!num.empty())
-                m.dy.push_back(stoi(num));
-        }
+            if (line.empty())
+                continue;
 
-        Node *node = new Node{m, nullptr};
+            stringstream ss(line);
+            Med m;
+            string qtyStr, timeStr, expStr, daysStr;
 
-        if (!L.head || m.t < L.head->a.t)
-        {
-            node->next = L.head;
-            L.head = node;
-        }
-        else
-        {
-            Node *r = L.head;
-            while (r->next && !(m.t < r->next->a.t))
-                r = r->next;
-            node->next = r->next;
-            r->next = node;
-        }
+            getline(ss, m.name, '|');
+            getline(ss, m.dosage, '|');
+            getline(ss, qtyStr, '|');
+            getline(ss, timeStr, '|');
+            getline(ss, expStr, '|');
+            getline(ss, daysStr, '|');
 
-        L.hash[{m.name, m.dosage}].push_back(node);
-        L.qty[{m.name, m.dosage}] = qty;
+            int qty = 0;
+            stringstream(qtyStr) >> qty;
+            stringstream(timeStr) >> m.t.h >> m.t.m;
+            stringstream(expStr) >> m.exp.d >> m.exp.m >> m.exp.y;
+
+            m.dy.clear();
+            string num;
+            stringstream ds(daysStr);
+            while (getline(ds, num, ','))
+            {
+                if (!num.empty())
+                    m.dy.push_back(stoi(num));
+            }
+
+            Node *node = new Node{m, nullptr};
+
+            if (!L.head || m.t < L.head->a.t)
+            {
+                node->next = L.head;
+                L.head = node;
+            }
+            else
+            {
+                Node *r = L.head;
+                while (r->next && !(m.t < r->next->a.t))
+                    r = r->next;
+
+                node->next = r->next;
+                r->next = node;
+            }
+
+            L.hash[{m.name, m.dosage}].push_back(node);
+            L.qty[{m.name, m.dosage}] = qty;
+        }
+    }
+    catch (...)
+    {
+        clearUserData(username, L);
+        cout << "[Error] Failed to load data. File may be corrupted.\n";
     }
 
     file.close();
@@ -84,8 +97,11 @@ void loadFromFile(LinkedList &L, const string &username)
 
 void commitToFile(const LinkedList &L, const string &username)
 {
+    std::filesystem::create_directories(DATA_DIR);
+
     string mainFile = DATA_DIR + "/" + username + "_data.txt";
     string tempFile = DATA_DIR + "/" + username + "_temp.txt";
+
     ofstream out(tempFile, ios::trunc);
     if (!out.is_open())
     {
@@ -115,6 +131,7 @@ void commitToFile(const LinkedList &L, const string &username)
                 out << ",";
         }
         out << "\n";
+
         r = r->next;
     }
 
@@ -124,7 +141,9 @@ void commitToFile(const LinkedList &L, const string &username)
     {
         if (std::filesystem::exists(mainFile))
             std::filesystem::remove(mainFile);
+
         std::filesystem::rename(tempFile, mainFile);
+
         cout << "All changes committed successfully.\n";
     }
     catch (const std::filesystem::filesystem_error &e)
