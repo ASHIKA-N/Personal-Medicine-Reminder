@@ -52,6 +52,7 @@ The system allows users to securely manage medicine schedules, quantities, expir
 ---
 
 ## Project Structure
+```text
 /cppfolder
 ├── Expiry.cpp
 ├── FileHandler.cpp
@@ -85,7 +86,7 @@ g++ -std=c++20 ./cppfolder/Main.cpp ./cppfolder/Stack.cpp ./cppfolder/Queue.cpp 
 3. Designed for console-based interaction
 
 # Authors
-Ashika N
-Marcus Abraham T
-Mokshit Saran P
-Dhayanithi M
+- Ashika N
+- Marcus Abraham T
+- Mokshit Saran P
+- Dhayanithi M
