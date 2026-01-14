@@ -70,8 +70,11 @@ The system allows users to securely manage medicine schedules, quantities, expir
 ├── Stack.hpp
 └── Struct.hpp
 
+```
+
 ---
 
+```text
 ## How to Run
 
 1. Compile the program:
@@ -79,6 +82,8 @@ g++ -std=c++20 ./cppfolder/Main.cpp ./cppfolder/Stack.cpp ./cppfolder/Queue.cpp 
 
 2. Run the Executable
 /Main.exe
+
+```
 
 ## Notes
 1. This project focuses on DSA implementation, not production-level security
