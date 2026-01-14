@@ -39,42 +39,34 @@ int main()
 
     while (attempts < 3 && !login)
     {
-        if (attempts == 0)
-        {
-            cout << "1.Login\n2.Register\nChoice: ";
-            cin >> ch1;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "1. Login\n2. Register\nChoice: ";
+        cin >> ch1;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-            if (ch1 == 1)
-            {
-                login = log.login();
-            }
-            else if (ch1 == 2)
-            {
-                login = log.regist();
-            }
-            else
-            {
-                cout << "Invalid option.\n";
+        if (ch1 == 1)
+        {
+            login = log.login();
+            if (!login)
                 attempts++;
-                continue;
-            }
+        }
+        else if (ch1 == 2)
+        {
+            login = log.regist();
+            if (!login)
+                attempts++;
         }
         else
         {
-            cout << "Login failed. Try again.\n";
-            attempts++;
-            login = log.login();
+            cout << "Invalid option.\n";
         }
-
-        if (!login)
-            attempts++;
     }
+
     if (!login)
     {
         cout << "Maximum login attempts exceeded. Exiting program.\n";
         return 0;
     }
+
     loadFromFile(L, log.getUser());
 
     while (true)

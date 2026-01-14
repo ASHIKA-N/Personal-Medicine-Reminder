@@ -37,7 +37,6 @@ bool Login::regist()
     {
         u = trim(u);
         transform(u.begin(), u.end(), u.begin(), ::tolower);
-        cout << "Checking against: [" << u << "]\n";
 
         if (u == user)
         {
