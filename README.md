@@ -1,39 +1,91 @@
-# Personal Medicine Reminder
+# Personal Medication Reminder (C++ / DSA Project)
 
-## Overview
-Personal Medicine Reminder is a C++ console-based application designed to help users manage and track their medication schedules.  
-The program allows users to store medicine details and receive reminders at appropriate times, reducing the risk of missed doses.
-
-This project focuses on applying core programming concepts such as file handling, data structures, and logical flow control.
+A console-based medication management system built using core **Data Structures & Algorithms** concepts.  
+The system allows users to securely manage medicine schedules, quantities, expiry reminders, and undo/redo operations.
 
 ---
 
 ## Features
-- Add and manage medicine schedules
-- Store user and medicine data persistently
-- Display reminders based on scheduled timings
-- Simple, menu-driven console interface
+
+### 🔐 User Authentication
+- Register & Login system  
+- Case-insensitive usernames  
+- Passwords stored using hashing  
+- Duplicate username prevention  
+- Per-user data isolation  
+
+### 💊 Medicine Management
+- Insert new medicines with time & quantity  
+- Delete by name + time  
+- Delete all medicines of a specific name  
+- Modify existing medicine details  
+- Search for medicines by name  
+- View all scheduled medicines  
+
+### ⏪ Undo / Redo
+- Undo last operation  
+- Redo undone operations  
+- Implemented using **Stack**  
+
+### 📅 Expiry & Reminder System
+- Expiry reminder before exit  
+- Daily medicine queue  
+- Quantity threshold alerts  
+- Custom reminder quantity per user  
+
+### 📁 File Handling
+- Persistent storage per user  
+- Automatic data load on login  
+- Safe commit on exit  
+- Option to delete all user data  
 
 ---
 
-## Tech Stack
-- **Language:** C++
-- **Concepts Used:**  
-  - File handling  
-  - Structures / classes  
-  - Conditional logic
-  - Menu-Driven Interface
-  - Modular programming
+## Data Structures Used
+
+- **Singly Linked List** – Medicine storage  
+- **Stack** – Undo/Redo operations  
+- **Queue** – Daily medicine reminders  
+- **File I/O** – Persistent storage  
+- **Hashing** – Password security  
 
 ---
 
-## How to Build and Run
+## Project Structure
+/cppfolder
+├── Expiry.cpp
+├── FileHandler.cpp
+├── Login.cpp
+├── Main.cpp
+├── Queue.cpp
+└── Stack.cpp
 
-### Requirements
-- C++ compiler (GCC / MinGW / g++)
+/hppfolder
+├── DS.hpp
+├── Expiry.hpp
+├── FileHandler.hpp
+├── Login.hpp
+├── Queue.hpp
+├── Stack.hpp
+└── Struct.hpp
 
-### Compile
-(To be Finalized)
+---
 
+## How to Run
 
+1. Compile the program:
+g++ -std=c++20 ./cppfolder/Main.cpp ./cppfolder/Stack.cpp ./cppfolder/Queue.cpp ./cppfolder/Expiry.cpp ./cppfolder/FileHandler.cpp ./cppfolder/Login.cpp -I./hppfolder -o Main.exe
 
+2. Run the Executable
+/Main.exe
+
+## Notes
+1. This project focuses on DSA implementation, not production-level security
+2. Password hashing is for academic purposes
+3. Designed for console-based interaction
+
+# Authors
+Ashika N
+Marcus Abraham T
+Mokshit Saran P
+Dhayanithi M
