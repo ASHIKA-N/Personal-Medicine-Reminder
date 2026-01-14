@@ -35,6 +35,10 @@ bool Login::regist()
 
     while (filecheck >> u >> v >> r)
     {
+        u = trim(u);
+        transform(u.begin(), u.end(), u.begin(), ::tolower);
+        cout << "Checking against: [" << u << "]\n";
+
         if (u == user)
         {
             cout << "Username already exists! Try a different one.\n";
