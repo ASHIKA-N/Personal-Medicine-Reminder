@@ -1,6 +1,7 @@
 #include "../hppfolder/Login.hpp"
 #include <filesystem>
 #include <limits>
+#include <algorithm>
 
 string Login::trim(const string &s)
 {
@@ -18,15 +19,35 @@ string Login::hashPassword(const string &password)
 bool Login::regist()
 {
     std::filesystem::create_directories(LDATA_DIR);
+    ofstream touch(file, ios::app);
+    touch.close();
     string user, pass;
     int rq = 0;
     cout << "Enter Username: ";
     cin >> user;
     user = trim(user);
+    transform(user.begin(), user.end(), user.begin(), ::tolower);
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    ifstream filecheck(file);
+    string u, v, r;
+
+    while (filecheck >> u >> v >> r)
+    {
+        if (u == user)
+        {
+            cout << "Username already exists! Try a different one.\n";
+            return false;
+        }
+    }
+
+    filecheck.close();
 
     cout << "Enter Password: ";
     cin >> pass;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    string hashpass = hashPassword(pass);
 
     cout << "Remind me when any medicine quantity is <= (0 for only zero): ";
     if (!(cin >> rq) || rq < 0)
@@ -34,26 +55,6 @@ bool Login::regist()
         cout << "Invalid input. Using default reminder = 0\n";
         rq = 0;
         cin.clear();
-    }
-
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-    string hashpass = hashPassword(pass);
-
-    ifstream filecheck(file);
-    if (filecheck.is_open())
-    {
-        string u, v, r;
-        while (filecheck >> u >> v >> r)
-        {
-            if (u == user)
-            {
-                cout << "Username already exists! Try a different one.\n";
-                filecheck.close();
-                return false;
-            }
-        }
-        filecheck.close();
     }
 
     ofstream filereg(file, ios::app);
@@ -77,6 +78,7 @@ bool Login::login()
     cout << "Enter Username: ";
     cin >> user;
     user = trim(user);
+    transform(user.begin(), user.end(), user.begin(), ::tolower);
     cout << "Enter Password: ";
     cin >> pass;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
