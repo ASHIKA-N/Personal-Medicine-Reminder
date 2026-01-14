@@ -74,9 +74,10 @@ The system allows users to securely manage medicine schedules, quantities, expir
 
 ---
 
-```text
+
 ## How to Run
 
+```text
 1. Compile the program:
 g++ -std=c++20 ./cppfolder/Main.cpp ./cppfolder/Stack.cpp ./cppfolder/Queue.cpp ./cppfolder/Expiry.cpp ./cppfolder/FileHandler.cpp ./cppfolder/Login.cpp -I./hppfolder -o Main.exe
 
